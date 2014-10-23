@@ -23,13 +23,13 @@ class Shell421 < Shell
 					next if input =~ /^\s*$/
 					raise Exception unless input =~ VALID_COMMAND
 
-					args = split(input)
-					if respond_to?(args[0])
-						output_pipe.write(send(*args).to_s + "\n")
+					command, *args = split(input)
+					if respond_to?(command)
+						output_pipe.write(public_send(command, *args).to_s + "\n")
 					else
-						fork {
-							exec(*args, {:in => input_pipe, :out => output_pipe})
-						}
+						Shell.undef_system_command("temp_command") if respond_to?("temp_command")
+						Shell.def_system_command("temp_command", command)
+						output_pipe.write(temp_command(*args))
 					end
 				rescue EOFError
 					break
