@@ -1,11 +1,7 @@
-require 'shell'
-require 'thread'
-require 'pathname'
-
-class Shell421 < Shell
+class Shell421
 	DOUBLE_QUOTED_WORD = /"[^"\n[[:cntrl:]]]*"/
 	SINGLE_QUOTED_WORD = /'[^'\n[[:cntrl:]]]*'/
-	PLAIN_WORD = /[\w-]*/
+	PLAIN_WORD = /[\w-]+/
 	WORD = /#{PLAIN_WORD}|#{DOUBLE_QUOTED_WORD}|#{SINGLE_QUOTED_WORD}/
 	VALID_COMMAND = /^ *(#{WORD})(( +#{WORD})*)$/
 
@@ -14,16 +10,17 @@ class Shell421 < Shell
 		Thread.new(self) do |shell|
 			loop do
 				begin
-					input = input_pipe.readline
-					command, args = split(input)
-					def_command(command)
+					input = input_pipe.readline.strip
+					next if input =~ /^\s*$/
+					raise Exception unless input =~ VALID_COMMAND
 
-					output_pipe.write(Thread.new(shell) { |shell|
-						shell.send(command.basename.to_s, *args)
-					}.value)
+					command, args = split(input)
+					fork {
+						exec(command, *args, {:in => input_pipe, :out => output_pipe})
+					}
 				rescue EOFError
 					break
-				rescue
+				rescue Exception
 					puts "error" # TODO: Error handling
 				end
 			end
@@ -41,21 +38,7 @@ class Shell421 < Shell
 			args << VALID_COMMAND.match(input)[1]
 			input = VALID_COMMAND.match(input)[2]
 		end
-		return Pathname.new(command), args
-	end
-
-	def def_command(command)
-		begin
-			Shell::undef_system_command(command.basename)
-		rescue
-		end
-		begin
-		unless respond_to?(command.basename.to_s)
-			Shell::def_system_command(command.basename, command)
-		end
-		rescue => ex
-			puts ex
-			raise ex
-		end
+		return command, args
 	end
 end
+
