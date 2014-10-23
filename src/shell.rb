@@ -1,7 +1,9 @@
-class Shell421
+require 'shell'
+
+class Shell421 < Shell
 	DOUBLE_QUOTED_WORD = /"[^"\n[[:cntrl:]]]*"/
 	SINGLE_QUOTED_WORD = /'[^'\n[[:cntrl:]]]*'/
-	PLAIN_WORD = /[\w-]+/
+	PLAIN_WORD = /[\w\.\/-]+/
 	WORD = /#{PLAIN_WORD}|#{DOUBLE_QUOTED_WORD}|#{SINGLE_QUOTED_WORD}/
 	VALID_COMMAND = /^ *(#{WORD})(( +#{WORD})*)$/
 
@@ -15,9 +17,14 @@ class Shell421
 					raise Exception unless input =~ VALID_COMMAND
 
 					command, args = split(input)
-					fork {
-						exec(command, *args, {:in => input_pipe, :out => output_pipe})
-					}
+					if respond_to?(command)
+						puts("#{command}, #{args}")
+						output_pipe.write(send(command, *args).to_s + "\n")
+					else
+						fork {
+							exec(command, *args, {:in => input_pipe, :out => output_pipe})
+						}
+					end
 				rescue EOFError
 					break
 				rescue Exception
