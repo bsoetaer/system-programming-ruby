@@ -4,6 +4,7 @@
 require_relative "shell" 
 require_relative "delayed_action"
 require_relative "file_tracker"
+include FileTracker
 
 #####################
 # Exercise 1: Shell #
@@ -15,7 +16,8 @@ shell_input_write.write("echo \"BOBBY\" \n")
 sleep 1
 # Should output "BOBBY"
 puts shell_output_read.readline
-shell.close
+# Closes the shell by closing the input pipe
+shell_input_write.close
 
 ###########################
 # Exercise 2: Timed Print #
@@ -37,13 +39,13 @@ watch_delete = ["demoTest3.rb", "demoTest3.txt"]
 `touch #{watch_delete[0]}`
 `touch #{watch_delete[1]}`
 sleep 1
-FileTracker.FileWatchCreation(watch_create, duration) do |f|
+FileWatchCreation(watch_create, duration) do |f|
 	puts "File #{f} was created."
 end
-FileTracker.FileWatchAlter(watch_alter, duration) do |f|
+FileWatchAlter(watch_alter, duration) do |f|
 	puts "File #{f} was alterred."
 end
-FileTracker.FileWatchDelete(watch_delete, duration) do |f|
+FileWatchDestroy(watch_delete, duration) do |f|
 	puts "File #{f} was deleted."
 end
 sleep 1
