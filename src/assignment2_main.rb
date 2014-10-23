@@ -1,5 +1,5 @@
 # Group 4 members: Isaac Supeene, Braeden Soetaert
-# Read compile.txt for steps to compile on lab machines.
+# Run compile.sh to compile on lab machines.
 
 require_relative "shell" 
 require_relative "delayed_action"
