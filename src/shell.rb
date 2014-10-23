@@ -46,6 +46,7 @@ class Shell421 < Shell
 		end
 	end
 
+	# Waits until shell's main thread ends.
 	def join
 		@t.join
 	end
