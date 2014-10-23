@@ -1,15 +1,14 @@
 require 'test/unit'
-require_relative '../timed_printout'
+require_relative '../delayed_action'
 
-class TimedPrintoutContract < Test::Unit::TestCase
-	include TimedPrintout
+class DelayedPrintContract < Test::Unit::TestCase
+	include DelayedAction
 	
-	def test_print_after
+	def test_delayed_print
 		# Setup
 		msg = "Test timed printout."
 		time_delay_seconds = 3
 		time_delay_nano = 50
-		time_before = Time.new
 		
 		# Preconditions
 		assert( time_delay_seconds >= 0, "Time Delay in seconds must be greater than 0.")
@@ -20,7 +19,7 @@ class TimedPrintoutContract < Test::Unit::TestCase
 		
 		# Function
 		time_before = Time.new
-		TimedPrintout.print_after(time_delay_seconds, time_delay_nano, msg)
+		DelayedAction.delayed_print(time_delay_seconds, time_delay_nano, msg)
 		time_after = Time.new
 		
 		# Postconditions
