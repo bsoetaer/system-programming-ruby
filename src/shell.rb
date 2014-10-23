@@ -1,6 +1,7 @@
 require 'shell'
 
 class Array
+	# Unfolds an array from the given seed.
 	def self.unfold_from(seed, &block)
 		value, seed = yield seed
 		return seed ? [value, *unfold_from(seed, &block)] : [value]
@@ -8,12 +9,14 @@ class Array
 end
 
 class Shell421 < Shell
+	# Very simple command specification.
 	DOUBLE_QUOTED_WORD = /"[^"\n[[:cntrl:]]]*"/
 	SINGLE_QUOTED_WORD = /'[^'\n[[:cntrl:]]]*'/
 	PLAIN_WORD = /[\w\.\/-]+/
 	WORD = /#{PLAIN_WORD}|#{DOUBLE_QUOTED_WORD}|#{SINGLE_QUOTED_WORD}/
 	VALID_COMMAND = /^ *(#{WORD})(( +#{WORD})*)$/
 
+	# Initializes the main loop.
 	def initialize(input_pipe, output_pipe)
 		super()
 		Thread.new(self) do |shell|
@@ -44,6 +47,7 @@ class Shell421 < Shell
 	end
 
 	private
+	# Splits input into a sequence of words.
 	def split(input)
 		Array.unfold_from(input) { |seed|
 			VALID_COMMAND.match(seed)[1..2].select{ |x| x !~ /^\s*$/ }
