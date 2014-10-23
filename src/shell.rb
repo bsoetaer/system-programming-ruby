@@ -19,7 +19,7 @@ class Shell421 < Shell
 	# Initializes the main loop.
 	def initialize(input_pipe, output_pipe)
 		super()
-		Thread.new(self) do |shell|
+		@t = Thread.new(self) do |shell|
 			loop do
 				begin
 					input = input_pipe.readline.strip
@@ -44,6 +44,11 @@ class Shell421 < Shell
 			input_pipe.close
 			output_pipe.close
 		end
+	end
+
+	# Waits until shell's main thread ends.
+	def join
+		@t.join
 	end
 
 	private
