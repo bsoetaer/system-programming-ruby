@@ -1,6 +1,6 @@
 %module Delay
 %{ 
-/* Header files or function prototypes go here in be included in the 
+/* Header files and function prototypes go here to be included in the 
 wrapper code*/ 
 #include <time.h> 
 extern int nanodelay(int sec, int nsec); 
